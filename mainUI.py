@@ -6,6 +6,7 @@ from functools import partial
 from Spectrogram import spectrogram
 from helpers import mixSongs, createPerceptualHash, getHammingDistance, mapRanges
 from updateDB import readJson
+import subprocess
 
 class voiceRecognizer(ui.Ui_MainWindow):
     """
@@ -36,11 +37,10 @@ class voiceRecognizer(ui.Ui_MainWindow):
         self.logger.setLevel(logging.DEBUG)
 
         # CONNECTIONS
-        for btn in self.loadBtns:
-            btn.clicked.connect(partial(self.loadFile, btn.property("indx")))
+        for i in range (2):
+            self.loadBtns[i].clicked.connect(lambda checked,i=i-1 :  self.loadFile(i))
 
         self.finderBtn.clicked.connect(self.__extract)
-
         self.resultsTable.hide()
         self.label_6.hide()
 
@@ -63,7 +63,7 @@ class voiceRecognizer(ui.Ui_MainWindow):
         if audFile == "":
             self.logger.debug("loading cancelled")
             self.statusbar.showMessage("Loading cancelled")
-            pass
+            
         else:
             self.logger.debug("starting extraction of data")
             audData, audRate = mp3ToData(audFile, 60000)
@@ -73,7 +73,8 @@ class voiceRecognizer(ui.Ui_MainWindow):
             self.lineEdits[indx-1].setText(audFile.split('/')[-1])
             self.statusbar.showMessage("Loading Done")
             self.logger.debug("Loading done")
-
+            
+        
     def __extract(self):
         """
         Responsible for the following :
